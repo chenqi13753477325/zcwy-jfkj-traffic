@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="screen" th:href="@{/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" type="text/css" media="screen" th:href="@{/layui/css/layui.css}"/>
+	<link rel="stylesheet" th:href="@{/css/ztree/demo.css}" type="text/css"/>
+	<link rel="stylesheet" th:href="@{/css/ztree/zTreeStyle/zTreeStyle.css}" type="text/css"/>
+    <script type="text/javascript" th:src="@{/js/libs/jquery-2.1.1.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/plugin/bootstrapvalidator/bootstrapValidator.min.js}"></script>
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+	<script type="text/javascript" th:src="@{/js/libs/jquery.ztree.all-3.5.min.js}"></script>
+	<script type="text/javascript" th:src="@{/js/my/ztree-menu.js}"></script>
+    <script type="text/javascript" th:src="@{/js/libs/jquery.ztree.exhide.min.js}"></script>
+
+</head>
+<body>
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<form class="form-horizontal" onsubmit="return false" id="form">
+		<fieldset>
+			<div class="form-group">
+			</div>
+			<div class="form-actions">
+				<div class="row" align="right" >
+					<div class="col-md-12">
+						<button class="btn btn-primary" onclick="location.href='user_list.html'">返回</button>
+						<button class="btn btn-primary"  onclick="update()">
+							保存
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="form-group">
+			<input type="hidden" id="id" name="id" th:value="${id}"/>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label">员工号</label>
+				<div class="col-md-10">
+					<input class="form-control" type="text" name="username" id="username" th:value="${username}" readonly="readonly" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label">姓名</label>
+				<div class="col-md-10">
+					<input class="form-control" ptype="text" name="nickname" id="nickname" th:value="${nickname}" readonly="readonly"/>
+				</div>
+			</div>
+            <div class="form-group">
+                <label class="col-md-2 control-label">状态</label>
+                <div class="col-md-10">
+                    <input class="form-control" type="hidden" name="status" id="status" th:value="${status}"/>
+					<input class="form-control" type="checkbox" id="statusId" />
+                </div>
+            </div>
+			<div class="form-group">
+				<label class="col-md-2 control-label">角色</label>
+				<div class="col-md-2" >
+					<select class="form-control" th:value="${sysRoles}" id="selectId">
+						<option value="">请选择</option>
+						<option th:each="item:${sysRoles}" th:id="${item.level}" th:text="${item.description}" th:value="${item.id}" th:selected="(${item.id} == ${roleUserId})"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group" id = "divTwoId" style="visibility: visible">
+				<label class="col-md-2 control-label">事业部以及项目</label>
+				<div class="col-md-2 control-label" id="treeDepartmentId" style="visibility: hidden">
+					<ul id="treeDepartment" class="ztree"></ul>
+				</div>
+				<div class="col-md-1 control-label" ></div>
+
+				<div class="col-md-2 control-label" id="treePjId" style="visibility: hidden">
+					<input id="citySel" type="text" placeholder="请输入项目关键字检索"
+						   style="width: 200px;"/><button onclick="AutoMatch()">搜索</button>
+					<ul id="treePj" class="ztree" style="height: 335px">
+					</ul>
+				</div>
+				<div class="col-md-1 control-label" ></div>
+				<div class="col-md-2 control-label" id="treeCustomerId" style="visibility: hidden">
+					<input id="citySels" type="text" placeholder="请输入客户关键字检索"
+						   onkeyup="AutoMatchs(this)"
+						   style="width: 200px;"/>
+					<ul id="treeCustomer" class="ztree" style="height: 335px">
+					</ul>
+				</div>
+			</div>
+
+
+		</fieldset>
+	</form>
+</div>
+
+
+</body>
+</html>
+
+<script type="text/javascript">
+    $(function(){
+    	var el = $("#status").val();
+    	if(el == 1){
+			document.getElementById("statusId").checked=true;
+		}else{
+			document.getElementById("statusId").checked=false;
+		}
+		var id = $("#id").val();
+        initRoleDatas(id);
+		initDepartmentDatas(id);
+		initPjDatas(id);
+		initCustomerDatas(id);
+		/*hiRadio();*/
+    })
+
+    function initRoleDatas(id) {
+        $.ajax({
+            type : 'get',
+            url : '/getRoleByUserId?userId=' + id,
+            success : function(data) {
+                for(var i in data){
+                	var varId = data[i]['level'];
+					hiRadios(varId);
+                }
+            }
+        });
+    }
+
+	function initDepartmentDatas(id){
+		$.ajax({
+			type : 'get',
+			url : '/getDepartmentByUserId?userId=' + id,
+			success : function(data) {
+				var treeObj = $.fn.zTree.getZTreeObj("treeDepartment");
+				var length = data.length;
+				if(length > 0){
+					var node = treeObj.getNodeByParam("id", 0, null);
+					treeObj.checkNode(node, true, false);
+				}
+				for(var i in data){
+					var node = treeObj.getNodeByParam("id", data[i], null);
+					treeObj.checkNode(node, true, false);
+				}
+			}
+		});
+	}
+
+	function initPjDatas(id){
+		$.ajax({
+			type : 'get',
+			url : '/getPjByUserId?userId=' + id,
+			success : function(data) {
+				var treeObj = $.fn.zTree.getZTreeObj("treePj");
+				var length = data.length;
+				if(length > 0){
+					var node = treeObj.getNodeByParam("id", 0, null);
+					treeObj.checkNode(node, true, false);
+				}
+				for(var i in data){
+					var node = treeObj.getNodeByParam("id", data[i], null);
+					treeObj.checkNode(node, true, false);
+				}
+
+			}
+		});
+	}
+
+
+	function initCustomerDatas(id){
+		$.ajax({
+			type : 'get',
+			url : '/getPjByUserIdCustomer?userId=' + id,
+			success : function(data) {
+				var treeObj = $.fn.zTree.getZTreeObj("treeCustomer");
+				var length = data.length;
+
+				if(length > 0){
+					var node = treeObj.getNodeByParam("id", 0, null);
+					treeObj.checkNode(node, true, false);
+				}
+				for(var i in data){
+					var node = treeObj.getNodeByParam("id", data[i], null);
+					treeObj.checkNode(node, true, false);
+				}
+
+			}
+		});
+	}
+
+    var p1 = "" ;
+
+    $('#form').bootstrapValidator();
+
+    function update() {
+        var bootstrapValidator = $("#form").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        if(!bootstrapValidator.isValid()){
+            return;
+        }
+
+		if(document.getElementById("statusId").checked){
+			$("#status").val(1)
+		}else{
+			$("#status").val(2)
+		}
+        var formdata = $("#form").serializeObject();
+		p1 = $("#selectId").val();
+		if(p1 == ''){
+            alert("请选择角色")
+            location.reload()
+        }
+		formdata.roleIds = p1;
+		var options=$("#selectId option:selected");
+		var pp1 = options.attr('id');
+		if(pp1 == 2){
+			formdata.departmentIds = getCheckedDepartmentIds();
+			if(formdata.departmentIds == ''){
+				alert("请选择关联事业部")
+				location.reload()
+			}
+		}else if(pp1 == 3){
+			formdata.pjIds = getCheckedPjIds();
+			formdata.customerIds = getCheckedCustomerIds()
+			/*<![CDATA[*/
+			if(formdata.pjIds == '' && formdata.customerIds==''){
+				alert("请选择关联项目")
+				location.reload()
+			}
+			/*]]>*/
+
+		}
+        $.ajax({
+            type : 'post',
+            url : '/updateUsers',
+            contentType: "application/json; charset=utf-8",
+            data : JSON.stringify(formdata),
+            success : function(data) {
+				layui.use(['layer', 'form'],function() {
+					var layer = layui.layer;
+					layer.msg("成功", {shift: -1, time: 1000}, function(){
+						location.href = "/user_list.html";
+					});
+				})
+            }
+        });
+    }
+
+
+
+	$.fn.zTree.init($("#treeDepartment"), getSettting(), getDepartmentTree());
+
+
+	$.fn.zTree.init($("#treePj"), getSettting(), getPjTree(""));
+
+
+	$.fn.zTree.init($("#treeCustomer"), getSettting(), getCustomerTree());
+
+
+	function hiRadio(id) {
+		if(id==1){
+			document.getElementById("divTwoId").style.visibility="hidden"
+			document.getElementById("treeDepartmentId").style.visibility="hidden"
+			document.getElementById("treePjId").style.visibility="hidden"
+		}else if(id==2){
+			document.getElementById("divTwoId").style.visibility="visible"
+			document.getElementById("treeDepartmentId").style.visibility="visible"
+			document.getElementById("treePjId").style.visibility="hidden"
+		}else if(id==3){
+			document.getElementById("divTwoId").style.visibility="visible"
+			document.getElementById("treeDepartmentId").style.visibility="hidden"
+			document.getElementById("treePjId").style.visibility="visible"
+		}else {
+			document.getElementById("divTwoId").style.visibility="hidden"
+			document.getElementById("treeDepartmentId").style.visibility="hidden"
+			document.getElementById("treePjId").style.visibility="hidden"
+		}
+	}
+
+	var setting = {
+		check: {
+			enable: true//checkbox
+		},
+		view: {
+			nameIsHTML: true, //允许name支持html
+			selectedMulti: false
+		},
+		edit: {
+			enable: false,
+			editNameSelectAll: false
+		},
+		data: {
+			simpleData: {
+				enable: true
+			}
+		}
+	};
+
+	var idVar = $("#id").val();
+	var timeVaa;
+	function AutoMatch() {
+		var txtObj = $("#citySel").val();
+		clearTimeout(timeVaa);
+		timeVaa = setTimeout(function () {
+			if(txtObj.length > 0){
+				var zTree = $.fn.zTree.getZTreeObj("treePj");
+				// var nodeList = zTree.getNodesByParamFuzzy("name", txtObj);
+				$.fn.zTree.init($("#treePj"), getSettting(), getPjTree(txtObj));
+				initPjDatas(idVar);
+			}else{
+				$.fn.zTree.init($("#treePj"), getSettting(), getPjTree(""));
+				initPjDatas(idVar);
+			}
+		},2000)
+	}
+
+	var timeVaas;
+	function AutoMatchs(txtObj) {
+		clearTimeout(timeVaa);
+		timeVaas = setTimeout(function () {
+			if(txtObj.value.length > 0){
+				var zTree = $.fn.zTree.getZTreeObj("treeCustomer");
+				var nodeList = zTree.getNodesByParamFuzzy("id", txtObj.value);
+				$.fn.zTree.init($("#treeCustomer"), getSettting(), getCustomerTree(nodeList));
+				initCustomerDatas(idVar);
+			}else{
+				$.fn.zTree.init($("#treeCustomer"), getSettting(), getCustomerTree());
+				initCustomerDatas(idVar);
+			}
+		},5000)
+	}
+
+	function hiRadios(v) {
+		if(v==1){
+			document.getElementById("divTwoId").style.visibility="hidden"
+			document.getElementById("treeDepartmentId").style.visibility="hidden"
+			document.getElementById("treePjId").style.visibility="hidden"
+			document.getElementById("treeCustomerId").style.visibility="hidden"
+		}else if(v==2){
+			document.getElementById("divTwoId").style.visibility="visible"
+			document.getElementById("treeDepartmentId").style.visibility="visible"
+			document.getElementById("treePjId").style.visibility="hidden"
+			document.getElementById("treeCustomerId").style.visibility="hidden"
+		}else if(v==3){
+			document.getElementById("divTwoId").style.visibility="visible"
+			document.getElementById("treeDepartmentId").style.visibility="hidden"
+			document.getElementById("treePjId").style.visibility="visible"
+			document.getElementById("treeCustomerId").style.visibility="visible"
+		}else{
+			document.getElementById("divTwoId").style.visibility="hidden"
+			document.getElementById("treeDepartmentId").style.visibility="hidden"
+			document.getElementById("treePjId").style.visibility="hidden"
+			document.getElementById("treeCustomerId").style.visibility="hidden"
+		}
+	}
+
+
+
+	$('#selectId').change(function () {
+        if($(this).children('option:selected')[0].childNodes[0]){
+            if($(this).children('option:selected')[0].childNodes[0].data){
+                p1 =$(this).children('option:selected')[0].value;
+                $.ajax({
+                    type : 'get',
+                    url : '/getSysRole?id=' + p1,
+                    success : function(data) {
+                        hiRadios(data.level)
+                    }
+                });
+            }
+        }
+    })
+
+
+
+
+
+
+</script>

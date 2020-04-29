@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dashboard.adp.dao.IpasProjMthPlanMapper">
+
+
+
+    <select id="list" resultType="java.util.HashMap" parameterType="java.lang.String">
+        select
+        contract_no as contract_no,
+        day1,
+        day2,
+        day3,
+        day4,
+        day5,
+        day6,
+        day7,
+        day8,
+        day9,
+        day10,
+        day11,
+        day12,
+        day13,
+        day14,
+        day15,
+        day16,
+        day17,
+        day18,
+        day19,
+        day20,
+        day21,
+        day22,
+        day23,
+        day24,
+        day25,
+        day26,
+        day27,
+        day28,
+        day29,
+        day30,
+        day31
+        from ipas_proj_mth_plan_his
+        where 1=1 and item_type like '%主需求%'
+        and contract_no = #{contractNo}
+    </select>
+
+    <select id="adpPlanCarrieResourceLoad" resultType="java.util.HashMap">
+        SELECT
+        moth,
+        mv_power,
+        qt_count
+        FROM
+        "adp_plan_carrie_resource_load"
+        ORDER BY
+        moth
+    </select>
+
+
+
+    <select id="adpPlanProjectMap" resultType="java.util.HashMap">
+        SELECT
+            SUM( appm.zl_count ) zl_count,
+            SUM ( appm.jh_count ) jh_count,
+            SUM ( appm.dz_count ) dz_count,
+            SUM ( appm.ts_count ) ts_count,
+            SUM ( appm.yys_count ) yys_count
+        FROM
+            "adp_plan_project_map" appm
+        LEFT JOIN
+            "adp_base_data" abd
+        ON
+            appm.pj_no = abd.pj_code
+        WHERE
+            pj_no = #{projectId}
+    </select>
+
+
+
+
+
+
+
+
+</mapper>

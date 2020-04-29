@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dashboard.adp.dao.AdpCapacityMapper">
+
+    <select id="fdjTotal" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        SELECT
+            sum(mot1)sum1,
+            sum(mot2)sum2,
+            sum(mot3)sum3,
+            sum(mot4) sum4,
+            sum(mot5)sum5,
+            sum(mot6) sum6,
+            sum(mot7) sum7,
+            sum(mot8) sum8,
+            sum(mot9) sum9,
+            sum(mot10) sum10,
+            sum(mot11) sum11,
+            sum(mot12) sum12
+            FROM
+        adp_capacity_fdj acf
+        WHERE 1=1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and acf.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  acf.model  in(${sortMap.machineType})
+        </if>
+	</select>
+
+    <select id="jcTotal" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        SELECT
+        sum(mot1)sum1,
+        sum(mot2)sum2,
+        sum(mot3)sum3,
+        sum(mot4) sum4,
+        sum(mot5)sum5,
+        sum(mot6) sum6,
+        sum(mot7) sum7,
+        sum(mot8) sum8,
+        sum(mot9) sum9,
+        sum(mot10) sum10,
+        sum(mot11) sum11,
+        sum(mot12) sum12
+        FROM
+        adp_capacity_jc acj
+        WHERE 1=1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and acj.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  acj.model  in(${sortMap.machineType})
+        </if>
+    </select>
+
+
+    <select id="ylTotal" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        SELECT
+            sum(mot1)sum1,
+            sum(mot2)sum2,
+            sum(mot3)sum3,
+            sum(mot4) sum4,
+            sum(mot5)sum5,
+            sum(mot6) sum6,
+            sum(mot7) sum7,
+            sum(mot8) sum8,
+            sum(mot9) sum9,
+            sum(mot10) sum10,
+            sum(mot11) sum11,
+            sum(mot12) sum12
+        FROM
+        "adp_capacity_yl" acy
+        WHERE 1=1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and acy.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  acy.model  in(${sortMap.machineType})
+        </if>
+    </select>
+
+
+    <select id="ypTotal" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        SELECT
+        sum(mot1)sum1,
+        sum(mot2)sum2,
+        sum(mot3)sum3,
+        sum(mot4) sum4,
+        sum(mot5)sum5,
+        sum(mot6) sum6,
+        sum(mot7) sum7,
+        sum(mot8) sum8,
+        sum(mot9) sum9,
+        sum(mot10) sum10,
+        sum(mot11) sum11,
+        sum(mot12) sum12
+        FROM
+        adp_capacity_yp acyp
+        WHERE 1=1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and acyp.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  acyp.model  in(${sortMap.machineType})
+        </if>
+    </select>
+
+
+    <select id="fdjMap" resultType="java.util.HashMap" parameterType="java.util.HashMap">
+        select  acf.factory,
+        acf.factory_lng,
+        acf.factory_lat,
+        acf.model,
+        sum1,
+        sum2,
+        sum3,
+        sum4,
+        sum5,
+        sum6,
+        sum7,
+        sum8,
+        sum9,
+        sum10,
+        sum11,
+        sum12
+        from
+        (SELECT
+        a.factory,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.plant_code,
+        sum(mot1)sum1,
+        sum(mot2)sum2,
+        sum(mot3)sum3,
+        sum(mot4) sum4,
+        sum(mot5)sum5,
+        sum(mot6) sum6,
+        sum(mot7) sum7,
+        sum(mot8) sum8,
+        sum(mot9) sum9,
+        sum(mot10) sum10,
+        sum(mot11) sum11,
+        sum(mot12) sum12
+        FROM
+        adp_capacity_fdj a
+        GROUP BY
+        a.factory,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.plant_code
+        ) acf
+        LEFT JOIN adp_base_factory_supplier apfd ON acf.plant_code = apfd.fac_sup_code
+        LEFT JOIN "adp_base_factory" AS abf ON acf.plant_code = abf.factory_code
+        WHERE 1=1
+            <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+                and acf.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+            </if>
+            <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+              and  acf.model  in(${sortMap.machineType})
+            </if>
+        <choose>
+            <when test="sortMap.factorytype!=null and sortMap.factorytype!= ''" >
+              AND apfd.fac_sup_flag IN (${sortMap.factorytype})
+            </when>
+        </choose>
+        <if test="sortMap.factory!=null and sortMap.factory!=''">
+            AND abf.factory_name in (${sortMap.factory})
+        </if>
+        <if test="sortMap.largeparttype!=null and  sortMap.largeparttype != '' ">
+            AND '发电机' in (SELECT DISTINCT
+            large_part
+            FROM
+            adp_producer_part_cat
+            WHERE
+            part_cat IN (${sortMap.largeparttype}))
+        </if>
+      <if test="sortMap.largepart!=null and sortMap.largepart != ''  ">
+        AND '发电机' in(${sortMap.largepart})
+      </if>
+    </select>
+
+    <select id="jcMap" resultType="java.util.HashMap" parameterType="java.lang.String">
+        select  acj.factory,
+            acj.factory_lng,
+            acj.factory_lat,
+            acj.model,
+            sum1,
+            sum2,
+            sum3,
+            sum4,
+            sum5,
+            sum6,
+            sum7,
+            sum8,
+            sum9,
+            sum10,
+            sum11,
+            sum12
+        from
+        (SELECT
+        a.factory,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.plant_code,
+        sum(mot1)sum1,
+        sum(mot2)sum2,
+        sum(mot3)sum3,
+        sum(mot4) sum4,
+        sum(mot5)sum5,
+        sum(mot6) sum6,
+        sum(mot7) sum7,
+        sum(mot8) sum8,
+        sum(mot9) sum9,
+        sum(mot10) sum10,
+        sum(mot11) sum11,
+        sum(mot12) sum12
+        FROM
+        adp_capacity_jc a
+        GROUP BY
+        a.factory,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.plant_code
+        ) acj
+        LEFT JOIN adp_base_factory_supplier apfd ON acj.plant_code = apfd.fac_sup_code
+        LEFT JOIN "adp_base_factory" AS abf ON acj.plant_code = abf.factory_code
+        WHERE 1=1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and acj.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  acj.model  in(${sortMap.machineType})
+        </if>
+        <choose>
+            <when test="sortMap.factorytype!=null and sortMap.factorytype!= ''" >
+                AND apfd.fac_sup_flag IN (${sortMap.factorytype})
+            </when>
+        </choose>
+        <if test="sortMap.factory!=null and sortMap.factory!=''">
+            AND abf.factory_name in (${sortMap.factory})
+        </if>
+        <if test="sortMap.largeparttype!=null and  sortMap.largeparttype != '' ">
+            AND '机舱' in (SELECT DISTINCT
+            large_part
+            FROM
+            adp_producer_part_cat
+            WHERE
+            part_cat IN (${sortMap.largeparttype}))
+        </if>
+        <if test="sortMap.largepart!=null and sortMap.largepart != ''  ">
+            AND '机舱' in(${sortMap.largepart})
+        </if>
+    </select>
+
+    <select id="ylMap" resultType="java.util.HashMap" parameterType="java.lang.String">
+        select  acy.factory,
+        acy.factory_lng,
+        acy.factory_lat,
+        acy.model,
+        sum1,
+        sum2,
+        sum3,
+        sum4,
+        sum5,
+        sum6,
+        sum7,
+        sum8,
+        sum9,
+        sum10,
+        sum11,
+        sum12
+        from
+        (SELECT
+        a.factory,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.plant_code,
+        sum(mot1)sum1,
+        sum(mot2)sum2,
+        sum(mot3)sum3,
+        sum(mot4) sum4,
+        sum(mot5)sum5,
+        sum(mot6) sum6,
+        sum(mot7) sum7,
+        sum(mot8) sum8,
+        sum(mot9) sum9,
+        sum(mot10) sum10,
+        sum(mot11) sum11,
+        sum(mot12) sum12
+        FROM
+        "adp_capacity_yl" a
+        GROUP BY
+        a.factory,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.plant_code
+        ) acy
+        LEFT JOIN adp_base_factory_supplier apfd ON acy.plant_code = apfd.fac_sup_code
+        LEFT JOIN "adp_base_factory" AS abf ON acy.plant_code = abf.factory_code
+        WHERE 1=1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and acy.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  acy.model  in(${sortMap.machineType})
+        </if>
+        <choose>
+            <when test="sortMap.factorytype!=null and sortMap.factorytype!= ''" >
+                AND apfd.fac_sup_flag IN (${sortMap.factorytype})
+            </when>
+        </choose>
+        <if test="sortMap.factory!=null and sortMap.factory!=''">
+            AND abf.factory_name in (${sortMap.factory})
+        </if>
+        <if test="sortMap.largeparttype!=null and  sortMap.largeparttype != '' ">
+            AND '叶轮' in (SELECT DISTINCT
+            large_part
+            FROM
+            adp_producer_part_cat
+            WHERE
+            part_cat IN (${sortMap.largeparttype}))
+        </if>
+        <if test="sortMap.largepart!=null and sortMap.largepart != ''  ">
+            AND '叶轮' in(${sortMap.largepart})
+        </if>
+
+    </select>
+
+    <select id="ypMap" resultType="java.util.HashMap" parameterType="java.lang.String">
+        select  acyp.supplier,
+        acyp.factory_lng,
+        acyp.factory_lat,
+        acyp.model,
+        sum1,
+        sum2,
+        sum3,
+        sum4,
+        sum5,
+        sum6,
+        sum7,
+        sum8,
+        sum9,
+        sum10,
+        sum11,
+        sum12
+        from
+        (SELECT
+        a.supplier,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.supp_code,
+        sum(mot1)sum1,
+        sum(mot2)sum2,
+        sum(mot3)sum3,
+        sum(mot4) sum4,
+        sum(mot5)sum5,
+        sum(mot6) sum6,
+        sum(mot7) sum7,
+        sum(mot8) sum8,
+        sum(mot9) sum9,
+        sum(mot10) sum10,
+        sum(mot11) sum11,
+        sum(mot12) sum12
+        FROM
+        adp_capacity_yp a
+        GROUP BY
+        a.supplier,
+        a.factory_lng,
+        a.factory_lat,
+        a.model,
+        a.supp_code
+        ) acyp
+        LEFT JOIN adp_base_factory_supplier apfd ON acyp.supp_code = apfd.fac_sup_code
+        LEFT JOIN "adp_base_factory" AS abf ON acyp.supp_code = abf.factory_code
+        WHERE 1=1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and acyp.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  acyp.model  in(${sortMap.machineType})
+        </if>
+        <choose>
+            <when test="sortMap.factorytype!=null and sortMap.factorytype!= ''" >
+                AND apfd.fac_sup_flag IN (${sortMap.factorytype})
+            </when>
+        </choose>
+        <if test="sortMap.factory!=null and sortMap.factory!=''">
+            AND abf.factory_name in (${sortMap.factory})
+        </if>
+        <if test="sortMap.largeparttype!=null and  sortMap.largeparttype != '' ">
+            AND '叶片' in (SELECT DISTINCT
+            large_part
+            FROM
+            adp_producer_part_cat
+            WHERE
+            part_cat IN (${sortMap.largeparttype}))
+        </if>
+        <if test="sortMap.largepart!=null and sortMap.largepart != ''  ">
+            AND '叶片' in(${sortMap.largepart})
+        </if>
+    </select>
+
+    <select id="sumAdpCapacityFdj" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT
+          <include refid="whereConditions"/>
+        FROM
+        adp_capacity_fdj
+    </select>
+
+    <select id="sumAdpCapacityJc" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT
+        <include refid="whereConditions"/>
+        FROM
+        adp_capacity_jc
+    </select>
+
+    <select id="sumAdpCapacityYl" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT
+        <include refid="whereConditions"/>
+        FROM
+        adp_capacity_yl
+    </select>
+
+    <select id="sumAdpCapacityYp" resultType="java.lang.Long" parameterType="java.lang.String">
+        SELECT
+        <include refid="whereConditions"/>
+        FROM
+        adp_capacity_yp
+    </select>
+
+
+
+
+
+    <sql id="whereConditions">
+        <if test="sortMap.month!=null and sortMap.month.toString() == '1'.toString()">
+            sum(mot1)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '2'.toString()">
+            sum(mot2)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '3'.toString()">
+            sum(mot3)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '4'.toString()">
+            sum(mot4)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '5'.toString()">
+            sum(mot5)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '6'.toString()">
+            sum(mot6)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '7'.toString()">
+            sum(mot7)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '8'.toString()">
+            sum(mot8)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '9'.toString()">
+            sum(mot9)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '10'.toString()">
+            sum(mot10)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '11'.toString()">
+            sum(mot11)
+        </if>
+        <if test="sortMap.month!=null and sortMap.month.toString() == '12'.toString()">
+            sum(mot12)
+        </if>
+
+
+
+    </sql>
+
+</mapper>

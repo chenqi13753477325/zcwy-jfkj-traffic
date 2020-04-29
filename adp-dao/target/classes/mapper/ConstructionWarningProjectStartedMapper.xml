@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dashboard.adp.dao.ConstructionWarningProjectStartedMapper">
+
+
+    <select id="cwpsPlanStartCount" resultType="java.lang.Integer">
+		SELECT count(*) FROM "adp_warning_construction_project_started" WHERE
+
+        three_evidence != 3 or
+        calibration != 4 or
+        four_standard != 4 or
+        base_comm_rate &lt; 80 or
+        complete_rate &lt; 40
+	</select>
+
+    <select id="cwpsPlanStartRatio" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(pj_plan_start_rate),0) FROM "adp_warning_construction_project_started"
+	</select>
+
+    <select id="cwpsCount" resultType="java.lang.Integer">
+		SELECT count(*) FROM "adp_warning_construction_project_started"
+	</select>
+
+
+    <select id="threeEvidenceCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+		SELECT count(*) FROM "adp_warning_construction_project_started" where three_evidence = #{threeEvidence}
+	</select>
+
+
+    <select id="threeEvidenceProject" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+		SELECT
+            bd.pj_name
+        FROM
+            adp_warning_construction_project_started cwps
+            LEFT JOIN adp_base_data bd ON cwps.pj_no = bd.pj_code
+        <!--
+             WHERE
+            cwps.three_evidence = #{threeEvidence}
+        -->
+	</select>
+
+    <select id="calibrationCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+		SELECT count(*) FROM "adp_warning_construction_project_started" where calibration = #{calibration}
+	</select>
+
+
+    <select id="calibrationProject" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+		SELECT
+            bd.pj_name
+        FROM
+            adp_warning_construction_project_started cwps
+            LEFT JOIN adp_base_data bd ON cwps.pj_no = bd.pj_code
+        WHERE
+            cwps.calibration = #{calibration}
+	</select>
+
+
+    <select id="fourStandardCount" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+		SELECT count(*) FROM "adp_warning_construction_project_started" where four_standard = #{fourStandard}
+	</select>
+
+    <select id="fourStandardProject" parameterType="java.lang.Integer" resultType="java.util.HashMap">
+		SELECT
+            bd.pj_name
+        FROM
+            adp_warning_construction_project_started cwps
+            LEFT JOIN adp_base_data bd ON cwps.pj_no = bd.pj_code
+        WHERE
+            cwps.four_standard = #{fourStandard}
+	</select>
+
+
+    <select id="sumBaseCommRateRatio" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(base_comm_rate),0) FROM "adp_warning_construction_project_started"
+	</select>
+
+    <select id="countBaseCommRateRatioIt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_project_started" WHERE
+        base_comm_rate &lt; 80
+	</select>
+
+    <select id="countBaseCommRateRatioGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_project_started" WHERE
+        base_comm_rate &gt;= 80
+	</select>
+
+    <select id="sumCompleteRateRatio" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(complete_rate),0) FROM "adp_warning_construction_project_started"
+	</select>
+
+
+    <select id="countCompleteRateRatioIt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_project_started" WHERE
+        complete_rate &lt; 40
+	</select>
+
+    <select id="countCompleteRateRatioGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_project_started" WHERE
+        complete_rate &gt;= 40
+	</select>
+
+</mapper>

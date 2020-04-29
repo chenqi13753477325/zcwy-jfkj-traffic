@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dashboard.adp.dao.ConstructionWarningHositingMapper">
+
+    <select id="count" resultType="java.lang.Integer">
+      SELECT count(*) FROM "adp_warning_construction_hositing"
+    </select>
+
+    <select id="warningHositingCount" resultType="java.lang.Integer">
+      SELECT count(*) FROM "adp_warning_construction_hositing" WHERE
+      /*项目计划开吊率*/
+      CAST(pj_plan_hositing_rate as INTEGER) &lt; 100 or
+      /*主吊数量*/
+      /*main_crane_number != 44 or*/
+      /*首台齐套到货到首吊时长*/
+      CAST(first_arrived_complete_time as INTEGER) &gt; 7 or
+      /*首台吊装预备齐套数*/
+      first_hositing_prepare_number &gt; 5 or
+      /*主吊进场后准备时长*/
+      main_crane_prepare_time &gt; 10 or
+      /*单台主吊作业效率*/
+      CAST(single_crane_rate as INTEGER) &lt; 8 or
+      /*吊车转场效率*/
+      CAST(crane_transfer as INTEGER) &gt;= 6
+      /*吊装未调试量*/
+      /*hositing_nodebug_number &gt; 0.4*/
+    </select>
+
+
+    <select id="sumAddHositingNum" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(add_hositing_num),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+
+    <select id="sumHositingCycle" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(hositing_cycle),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+
+    <select id="sumPjPlanHositingRate" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(CAST(pj_plan_hositing_rate as INTEGER)),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <select id="pjPlanHositingRateLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(pj_plan_hositing_rate as INTEGER)  &lt;  100
+	</select>
+
+    <select id="pjPlanHositingRateGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(pj_plan_hositing_rate as INTEGER) = 100
+	</select>
+
+    <select id="sumMainCraneNumber" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(main_crane_number),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <select id="sumFirstArrivedCompleteTime" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(CAST(first_arrived_complete_time as INTEGER)),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <select id="firstArrivedCompleteTimeLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(first_arrived_complete_time as INTEGER) &lt; 7
+	</select>
+
+    <select id="firstArrivedCompleteTimeGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(first_arrived_complete_time as INTEGER) &gt; 7
+	</select>
+
+    <select id="sumFirstHositingPrepareNumber" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(first_hositing_prepare_number),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <select id="firstHositingPrepareNumberLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        first_hositing_prepare_number &lt; 5
+	</select>
+
+    <select id="firstHositingPrepareNumberGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        first_hositing_prepare_number &gt; 5
+	</select>
+
+    <select id="sumMainCranePrepareTime" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(main_crane_prepare_time),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <select id="mainCranePrepareTimeLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        main_crane_prepare_time &gt; 10
+	</select>
+
+    <select id="mainCranePrepareTimeGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        main_crane_prepare_time &gt; 10
+	</select>
+
+
+    <select id="sumSingleCraneRate" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(CAST(single_crane_rate as INTEGER)),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <select id="singleCraneRateLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(single_crane_rate as INTEGER) &lt; 8
+	</select>
+
+    <select id="singleCraneRateGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(single_crane_rate as INTEGER) &gt; 8
+	</select>
+
+
+    <select id="sumCraneTransfer" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(CAST(crane_transfer as INTEGER)),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <select id="craneTransferGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(crane_transfer as INTEGER) $gt; 6
+	</select>
+
+    <select id="craneTransferLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        CAST(crane_transfer as INTEGER) $lt; 6
+	</select>
+
+
+    <select id="sumHositingNodebugNumber" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(hositing_nodebug_number),0) FROM "adp_warning_construction_hositing"
+	</select>
+
+    <!--<select id="hositingNodebugNumberGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_hositing" where
+        hositing_nodebug_number $gt;
+	</select>
+
+    <select id="hositingNodebugNumberLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+         SELECT count(*) FROM "adp_warning_construction_hositing" where
+        hositing_nodebug_number $lt;
+	</select>-->
+
+
+
+
+
+</mapper>

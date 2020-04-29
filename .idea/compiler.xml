@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="adp-api" />
+        <module name="adp-dao" />
+        <module name="adp-service" />
+        <module name="adp-web" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="adp-api" target="1.8" />
+      <module name="adp-dao" target="1.8" />
+      <module name="adp-parent" target="1.8" />
+      <module name="adp-service" target="1.8" />
+      <module name="adp-web" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

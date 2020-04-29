@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper
+	namespace="com.dashboard.adp.dao.BaseDataVOMapper">
+
+	<resultMap id="BaseResultWeatherMap"
+			   type="com.dashboard.adp.api.bean.AdJinFengWeather">
+		<id column="id" property="id" jdbcType="VARCHAR" />
+		<id column="pj_code" property="pj_code" jdbcType="VARCHAR" />
+		<id column="pj_longitude" property="pj_longitude" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!--查询所有国家 -->
+	<select id="queryCountry"  resultType="java.util.HashMap"  >
+		SELECT  DISTINCT BD.country as country
+		FROM adp_base_data BD WHERE	BD.country != ''	AND BD.country IS NOT NULL
+		ORDER BY BD.country
+	</select>
+
+	<!--查询所有区域 -->
+	<select id="queryRegion"  resultType="java.util.HashMap"  >
+	SELECT DISTINCT BD.region AS region
+	FROM adp_base_data BD	WHERE	BD.region != ''	AND BD.region IS NOT NULL
+	ORDER BY BD.region
+	</select>
+
+	<!--查询所有省 -->
+	<select id="queryProvince" parameterType="java.lang.String" resultType="java.util.HashMap"  >
+
+	SELECT DISTINCT abp.province_name AS province
+	FROM adp_base_province  abp
+	LEFT join adp_base_data abd
+	ON abp.province_name = abd.province
+	WHERE	abp.province_name != ''	AND abp.province_name IS NOT NULL
+		<if test="regions != null and regions !=''">
+			AND EXISTS (
+			SELECT province FROM adp_base_data abd WHERE abd.region in (${regions}) AND abp.province_name=abd.province )
+		</if>
+		<if test="roleId != null and '2'.toString()== roleId.toString()">
+			and abd.contract_no in (
+			select contract_no  from adp_base_data where department in(
+			select service_department_name from adp_base_service_department where service_department_code
+			in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+			in (select id from  sys_user where username = #{userName}))))
+		</if>
+		<if test="roleId != null and '3'.toString()== roleId.toString()">
+			and abd.contract_no  in (
+			select contract_no from adp_base_data where contract_no
+			in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+			in (select id from  sys_user where username = #{userName})))
+		</if>
+
+	ORDER BY abp.province_name
+	</select>
+
+	<!--查询所有企业性质 -->
+	<select id="queryEnterpriseNatures" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT DISTINCT
+			BD.pj_custnature AS pj_custnature
+		FROM
+			adp_base_data BD
+		WHERE
+			BD.pj_custnature != ''
+			AND BD.pj_custnature IS NOT NULL
+			<if test="roleId != null and '2'.toString()== roleId.toString()">
+				and BD.contract_no in (
+				select contract_no  from adp_base_data where department in(
+				select service_department_name from adp_base_service_department where service_department_code
+				in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+				in (select id from  sys_user where username = #{userName}))))
+			</if>
+			<if test="roleId != null and '3'.toString()== roleId.toString()">
+				and BD.contract_no  in (
+				select contract_no from adp_base_data where contract_no
+				in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+				in (select id from  sys_user where username = #{userName})))
+			</if>
+		ORDER BY BD.pj_custnature
+	</select>
+
+	<!--查询所有客户 -->
+	<select id="queryCustomer" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT DISTINCT
+		BD.pj_customer AS pj_customer
+		FROM
+		adp_base_data BD
+		WHERE
+		BD.pj_customer != ''
+		AND BD.pj_customer IS NOT NULL
+		<if test="roleId != null and '2'.toString()== roleId.toString()">
+			and BD.contract_no in (
+			select contract_no  from adp_base_data where department in(
+			select service_department_name from adp_base_service_department where service_department_code
+			in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+			in (select id from  sys_user where username = #{userName}))))
+		</if>
+		<if test="roleId != null and '3'.toString()== roleId.toString()">
+			and BD.contract_no  in (
+			select contract_no from adp_base_data where contract_no
+			in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+			in (select id from  sys_user where username = #{userName})))
+		</if>
+		<if test="pjCustnature != null and pjCustnature !=''">
+			and BD.pj_custnature in (${pjCustnature})
+		</if>
+
+		ORDER BY BD.pj_customer
+	</select>
+
+	<!--查询所有客户事业部 -->
+	<select id="queryDepartment" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT DISTINCT
+			absd.service_department_name as department
+		FROM
+			adp_base_service_department absd
+		LEFT join adp_base_data abd
+		ON abd.department = absd.service_department_name
+		WHERE
+			absd.service_department_name != ''
+			AND absd.service_department_name IS NOT NULL
+			<if test="roleId != null and '2'.toString()== roleId.toString()">
+				and abd.contract_no in (
+				select contract_no  from adp_base_data where department in(
+				select service_department_name from adp_base_service_department where service_department_code
+				in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+				in (select id from  sys_user where username = #{userName}))))
+			</if>
+			<if test="roleId != null and '3'.toString()== roleId.toString()">
+				and abd.contract_no  in (
+				select contract_no from adp_base_data where contract_no
+				in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+				in (select id from  sys_user where username = #{userName})))
+			</if>
+		ORDER BY absd.service_department_name
+	</select>
+	
+	<!--查询所有销售主体 -->
+	<select id="querySaleSubject" resultType="java.util.HashMap" parameterType="java.lang.String">
+		SELECT DISTINCT
+			BD.sale_comp AS sale_subject
+		FROM
+			adp_base_data BD
+		WHERE
+			BD.sale_comp != ''
+			AND BD.sale_comp IS NOT NULL
+			<if test="roleId != null and '2'.toString()== roleId.toString()">
+				and BD.contract_no in (
+				select contract_no  from adp_base_data where department in(
+				select service_department_name from adp_base_service_department where service_department_code
+				in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+				in (select id from  sys_user where username = #{userName}))))
+			</if>
+			<if test="roleId != null and '3'.toString()== roleId.toString()">
+				and BD.contract_no  in (
+				select contract_no from adp_base_data where contract_no
+				in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+				in (select id from  sys_user where username = #{userName})))
+			</if>
+		ORDER BY BD.sale_comp
+	</select>
+
+	<!--查询所有销售事业部-->
+    <select id="querySaleDept" parameterType="java.lang.String" resultType="java.util.HashMap">
+        SELECT DISTINCT
+        BD.sale_dept AS sale_dept
+        FROM
+        adp_base_data BD
+        WHERE
+        BD.sale_dept != ''
+        AND BD.sale_dept IS NOT NULL
+		<if test="roleId != null and '2'.toString()== roleId.toString()">
+			and BD.contract_no in (
+			select contract_no  from adp_base_data where department in(
+			select service_department_name from adp_base_service_department where service_department_code
+			in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+			in (select id from  sys_user where username = #{userName}))))
+		</if>
+		<if test="roleId != null and '3'.toString()== roleId.toString()">
+			and BD.contract_no  in (
+			select contract_no from adp_base_data where contract_no
+			in(select "pjPermissionId" from sys_user_pj_permission where "userId"
+			in (select id from  sys_user where username = #{userName})))
+		</if>
+        <if test="saleComps != null and saleComps !=''">
+            and BD.sale_comp in (${saleComps})
+        </if>
+		ORDER BY BD.sale_dept
+    </select>
+
+    <!--查询所有机型平台 -->
+    <select id="queryModelPlatforms" resultType="java.util.HashMap">
+		SELECT DISTINCT
+			platform
+		FROM
+			adp_base_model
+		WHERE
+			platform != ''
+			AND platform IS NOT NULL
+		ORDER BY platform
+	</select>
+
+	<!--查询所有机型 -->
+	<select id="queryContrmodModels" parameterType="java.lang.String" resultType="java.util.HashMap">
+		select distinct model as contrmod_models
+		from adp_market_hand_order
+		WHERE
+			model != ''
+		AND model IS NOT NULL
+		<if test="platforms != null and platforms !=''">
+			and platform in (${platforms})
+		</if>
+		<if test="customer != null and customer !=''">
+			and customer in (${customer})
+		</if>
+		ORDER BY model
+
+		<!--SELECT DISTINCT-->
+		<!--model AS contrmod_models-->
+		<!--FROM-->
+		<!--adp_base_model-->
+		<!--WHERE-->
+		<!--model != ''-->
+		<!--AND model IS NOT NULL-->
+		<!--<if test="platforms != null and platforms !=''">-->
+			<!--and platform in (${platforms})-->
+		<!--</if>-->
+		<!--ORDER BY model-->
+    </select>
+
+	<!--查询经纬度 -->
+	<select id="queryLongLat"  resultMap="BaseResultWeatherMap"  parameterType="java.lang.String">
+		SELECT
+		BD.pj_longitude as pj_longitude,
+		BD.pj_latitude as pj_latitude
+		FROM
+		adp_base_data BD
+		WHERE
+		BD.contract_no = #{contractno}
+	</select>
+
+	<!--查询所有机组环境 -->
+	<select id="queryEnvironments" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT DISTINCT
+			environment
+		FROM
+			adp_market_hand_order
+		WHERE
+			environment != ''
+			AND environment IS NOT NULL
+			<if test="terrains != null and terrains !=''">
+				AND terrain in (${terrains})
+			</if>
+		ORDER BY environment
+	</select>
+
+	<!--查询所有地形 -->
+	<select id="queryTerrains"  resultType="java.util.HashMap">
+		SELECT DISTINCT
+			terrain
+		FROM
+			adp_market_hand_order
+		WHERE
+			terrain != ''
+			AND terrain IS NOT NULL
+		ORDER BY terrain
+	</select>
+
+	<!--查询所有风区 -->
+	<select id="queryWindResources"  resultType="java.util.HashMap">
+		SELECT DISTINCT
+			wind_resources as windresources
+		FROM
+			ipas_project_info
+		WHERE
+			wind_resources != ''
+			AND wind_resources IS NOT NULL
+		ORDER BY wind_resources
+	</select>
+
+	<!--查询所有承运商 -->
+	<select id="querySuppliers"  resultType="java.util.HashMap">
+		SELECT DISTINCT
+			supplier_name as suppliername
+		FROM
+			adp_base_supplier
+		WHERE
+			supplier_name != ''
+			AND supplier_name IS NOT NULL and is_carrier = '是'
+		ORDER BY supplier_name
+	</select>
+
+	<!--查询所有工厂类型 -->
+	<select id="queryFactoryTypes"  resultType="java.util.HashMap">
+		SELECT DISTINCT
+			fac_sup_flag as factorytype
+		FROM
+			adp_base_factory_supplier
+		WHERE
+			fac_sup_flag != ''
+			AND fac_sup_flag IS NOT NULL
+		ORDER BY fac_sup_flag
+	</select>
+
+	<!--查询所有工厂 -->
+	<select id="queryFactorys" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT DISTINCT
+		fac_sup_name  as factoryname
+		FROM
+		adp_base_factory_supplier
+		WHERE
+		fac_sup_name  != ''
+		AND fac_sup_name  IS NOT NULL
+		AND (fac_sup_code LIKE '%P%' OR fac_sup_code LIKE '%X%' OR is_materiel = '是')
+
+		<!--<if test="factorytypes.isOnlyfacttory != null and factorytypes.isOnlyfacttory == 0 ">-->
+			<!--AND (fac_sup_code LIKE '%P%' OR fac_sup_code LIKE '%X%')-->
+		<!--</if>-->
+		<!--<if test="factorytypes.isOnlyfacttory != null and factorytypes.isOnlyfacttory == 1 ">-->
+			<!--AND is_materiel = '是'-->
+		<!--</if>-->
+		<!--<if test="factorytypes.isOnlyfacttory == null and factorytypes.factorytype != null and factorytypes.factorytype !=''-->
+		 <!--and factorytypes.factorytype.indexOf('工厂') != -1 and factorytypes.factorytype.indexOf('供应商') != -1 ">-->
+			<!--AND ((fac_sup_code LIKE '%P%' OR fac_sup_code LIKE '%X%') OR is_materiel = '是')-->
+		<!--</if>-->
+		<if test="factorytypes.factorytype != null and factorytypes.factorytype !=''">
+			AND fac_sup_flag IN (${factorytypes.factorytype})
+		</if>
+		ORDER BY fac_sup_name
+	</select>
+
+	<!--查询所有生产大部件类型 -->
+	<select id="queryLargePartTypes"  resultType="java.util.HashMap">
+		SELECT DISTINCT
+			part_cat  as parttype
+		FROM
+			adp_producer_part_cat
+		WHERE
+			part_cat  != ''
+			AND part_cat  IS NOT NULL
+		ORDER BY part_cat
+	</select>
+
+	<!--查询所有生产大部件 -->
+	<select id="queryLargeParts" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT DISTINCT
+		large_part  as largepart
+		FROM
+		adp_producer_part_cat
+		WHERE
+		large_part  != ''
+		AND large_part  IS NOT NULL
+
+		<if test="parttypes != null and parttypes !=''">
+			AND part_cat in (${parttypes})
+		</if>
+		ORDER BY large_part
+	</select>
+
+	<!--查询所有采购关键部件类型 -->
+	<select id="queryKeyLargePartTypes"  resultType="java.util.HashMap">
+		SELECT DISTINCT
+			part_cat  as keyparttype
+		FROM
+			adp_purchase_sup_map
+		WHERE
+			part_cat  != ''
+			AND part_cat  IS NOT NULL
+		ORDER BY part_cat
+	</select>
+
+	<!--查询所有生产关键部件 -->
+	<select id="queryKeyLargeParts" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT DISTINCT
+		part_name  as keylargepart
+		FROM
+		adp_purchase_sup_map
+		WHERE
+		part_name  != ''
+		AND part_name  IS NOT NULL
+
+		<if test="keyparttypes != null and keyparttypes !=''">
+			AND part_cat in (${keyparttypes})
+		</if>
+		ORDER BY part_name
+	</select>
+	<update id="updateWarnList" parameterType="java.util.HashMap">
+      UPDATE adp_warning_list
+      SET
+      		comp_flag = #{state},
+      		warn_qty = #{value},
+      		issue_type = #{classify},
+      		req_person = #{username},
+      		req_describe = #{describe},
+      		results = #{result},
+      		pmc_schedule = #{progress},
+      		duty_dept = #{department},
+      		duty_center = #{center},
+      		solve_person = #{processperson},
+      		req_department = #{demand}
+      WHERE
+      		id = #{id}
+
+  	</update>
+	<!--查询所有预警分类 -->
+	<select id="queryWarnTypes"  resultType="java.util.HashMap">
+		SELECT DISTINCT warn_l1 as warntype
+		FROM  adp_base_warning_list
+		ORDER BY warn_l1 DESC
+	</select>
+
+	<!--获取指标列表 -->
+	<select id="queryQuotaList"  resultType="java.util.HashMap" parameterType="String">
+		select distinct warn as indicators from  adp_base_warning_list
+		<if test="warntypes != null and warntypes !=''">
+			where warn_l1 in (${warntypes})
+		</if>
+
+		order by warn asc
+	</select>
+
+	<!--获取保障类型 -->
+	<select id="protectiontype"  resultType="java.util.HashMap">
+		SELECT DISTINCT
+			support_type securitytype
+		FROM
+			adp_market_sop_plan
+		ORDER BY
+			support_type
+	</select>
+
+	<!--保存预警-预警清单合集-->
+	<insert id="saveAdpWarningList" parameterType="java.util.HashMap">
+       INSERT INTO adp_warning_list
+	   ("warn_level","warn_body_code","warn_body","warn", "warn_item", "warn_qty", "comp_flag","dept_flag","proj_flag", "issue_type", "req_person", "req_describe", "results", "pmc_schedule", "duty_dept", "duty_center","warn_class","solve_person","req_department")
+	   VALUES
+	   ('项目',#{warnBodyCode},#{warnBody},#{warn},'',#{warnQty},#{compFlag},#{compFlag},#{compFlag},#{issueType},#{reqPerson},#{reqDescribe},#{results},#{pmcSchedule},#{dutyDept},#{dutyCenter},'',#{solvePerson},#{reqDepartment})
+   </insert>
+
+	<!--删除预警-预警清单合集-->
+	<delete id="delAdpWarningList">
+           delete from adp_warning_list where "id" = #{id}
+    </delete>
+
+	<!--根据预警分类获取预警指标-->
+	<select id="getWarnByWarnlo"  resultType="java.util.HashMap">
+		select distinct warn as warn from  adp_base_warning_list
+		where 1=1
+		<if test="warnlo != null and warnlo !=''">
+			AND warn_l1 = #{warnlo}
+		</if>
+		order by warn asc
+	</select>
+
+	<!--唯一性的效验-->
+	<select id="getBaseDateNameByCodeWarn" resultType="java.lang.Integer" parameterType="java.lang.String">
+		select count(*) from adp_warning_list where warn_body_code = #{warnBodyCode} and warn = #{warnStr}
+    </select>
+
+	<!--通过合同编号获取项目名称-->
+	<select id="getBaseDateNameById" resultType="java.lang.String" parameterType="java.lang.String">
+		select pj_name as pjName from adp_base_data where contract_no = #{warnBodyCode}
+    </select>
+
+
+
+
+	<!--采购-日报报缺日报-工厂列表 -->
+	<select id="selFactoryName" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT
+		distinct factory_name as "factoryName"
+		FROM
+		adp_purchase_daily_list
+	</select>
+	<!-- 查看当前项目（合同编号）下当前月份是否上传过视频-->
+	<select id="isVideo" resultType="java.util.HashMap" parameterType="java.util.Map">
+		select video_path as "videoPath" from sys_video
+		where contract_no = #{map.contractNo}
+		and month = #{map.month}
+	</select>
+	<!-- 根据合同号和日期修改视频名称和视频存储路径 -->
+	<update id="update" parameterType="java.util.Map">
+        update sys_video set video_name = #{map.videoName},updatetime = now(),video_path=#{map.videoPath},"fileTime"=#{map.fileTime}
+        where contract_no = #{map.contractNo} and month = #{map.month}
+	</update>
+	<!-- 给当前项目（合同编号）添加某月的视频信息，合同编号，视频名称，视频存储路径-->
+	<insert id="insert" parameterType="java.util.Map">
+		insert into sys_video values(#{map.contractNo},#{map.month},#{map.videoName},#{map.videoPath},now(),now(),#{map.fileTime});
+	</insert>
+</mapper>

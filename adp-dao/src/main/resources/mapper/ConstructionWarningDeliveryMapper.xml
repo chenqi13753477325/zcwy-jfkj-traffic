@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dashboard.adp.dao.ConstructionWarningDeliveryMapper">
+
+
+    <select id="count" resultType="java.lang.Integer">
+      SELECT count(*) FROM "adp_warning_construction_delivery"
+    </select>
+
+    <select id="warningDeliveryCount" resultType="java.lang.Integer">
+      SELECT count(*) FROM "adp_warning_construction_delivery" WHERE
+      <!--基础具备吊装条件到首个大部件到货时长-->
+      first_arrival_time_value = 1 or
+      <!--到货未吊装时长-->
+      arrival_nohoisting_time_value = 1 or
+      <!--主机到货未吊装时长-->
+      host_arrival_nohoisting_time &gt; 2 or
+      <!--单台塔筒平均生产周期-->
+      single_tower_cycel &gt; 65 or
+      <!--塔架到货未吊装量-->
+      tower_arrival_nohoisting_time &lt; 2
+    </select>
+
+
+    <select id="sumArrivalNum" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(arrival_num),0) FROM "adp_warning_construction_delivery"
+	</select>
+
+
+    <select id="sumArrivalCycle" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(CAST(arrival_cycle as INTEGER)),0) FROM "adp_warning_construction_delivery"
+	</select>
+
+
+    <select id="sumFirstArrivalTime" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(first_arrival_time),0) FROM "adp_warning_construction_delivery"
+	</select>
+
+    <select id="sumArrivalNohoistingTime" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(arrival_nohoisting_time),0) FROM "adp_warning_construction_delivery"
+	</select>
+
+    <select id="sumHostArrivalNohoistingTime" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(host_arrival_nohoisting_time),0) FROM "adp_warning_construction_delivery"
+	</select>
+
+    <select id="sumSingleTowerCycel" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(single_tower_cycel),0) FROM "adp_warning_construction_delivery"
+	</select>
+
+    <select id="sumTowerArrivalNohoistingTime" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT COALESCE(SUM(tower_arrival_nohoisting_time),0) FROM "adp_warning_construction_delivery"
+	</select>
+
+    <select id="countFirstArrivalTimeGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        first_arrival_time &gt; 10
+	</select>
+
+    <select id="countFirstArrivalTimeLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        first_arrival_time &lt; 10
+	</select>
+
+
+    <select id="countArrivalNohoistingTimeGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        arrival_nohoisting_time &gt; 30
+	</select>
+
+    <select id="countArrivalNohoistingTimeLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        arrival_nohoisting_time &lt; 30
+	</select>
+
+
+    <select id="countHostArrivalNohoistingTimeGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        host_arrival_nohoisting_time &gt; 2
+	</select>
+
+    <select id="countHostArrivalNohoistingTimeLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        host_arrival_nohoisting_time &lt; 2
+	</select>
+
+    <select id="countsingleTowerCycelGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        single_tower_cycel &gt; 65
+	</select>
+
+    <select id="countsingleTowerCycelLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        single_tower_cycel &lt; 65
+	</select>
+
+
+    <select id="counttowerArrivalNohoistingTimeGt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        tower_arrival_nohoisting_time &gt; 2
+	</select>
+
+
+    <select id="counttowerArrivalNohoistingTimeLt" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT count(*) FROM "adp_warning_construction_delivery" where
+        tower_arrival_nohoisting_time &lt; 2
+	</select>
+
+
+
+
+
+</mapper>

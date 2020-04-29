@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head lang="en">
+        <meta charset="UTF-8"/>
+        <title>菜单列表</title>
+        <link rel="stylesheet" type="text/css" media="screen" th:href="@{/css/bootstrap.min.css}"/>
+        <link rel="stylesheet" type="text/css" media="screen" th:href="@{/css/dataTables.bootstrap.min.css}"/>
+        <link rel="stylesheet" type="text/css" media="screen" th:href="@{/layui/css/layui.css}"/>
+        <script type="text/javascript" th:src="@{/js/libs/jquery-2.1.1.min.js}"></script>
+        <script type="text/javascript" th:src="@{/js/plugin/datatables/jquery.dataTables.min.js}"></script>
+        <script type="text/javascript" th:src="@{/js/plugin/datatables/dataTables.bootstrap.min.js}"></script>
+        <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    </head>
+    <body>
+        <div>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <header style="height: 100%">
+                    <div align="left">
+                        <hr/>
+                    </div>
+                </header>
+
+                <div>
+                    <div class="widget-body no-padding">
+                        <table id="dt-table" class="table table-striped table-bordered table-hover" style="width:100%">
+                            <thead>
+                                <tr>
+                                </tr>
+                                <tr>
+                                    <th style="width: 5%">序号</th>
+                                    <th style="width: 25%">名称</th>
+                                    <th style="width: 30%">标识</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script type="text/javascript">
+    var example;
+    function init(){
+        example =
+            $('#dt-table').DataTable({
+
+                "searching": false,//禁用原生搜索
+                "processing": false,//true隐藏加载提示,自行处理
+                "serverSide" : false,//启用服务器端分页
+                "bLengthChange": false,//每页显示多少条数据下拉框
+                "paging": false,
+                "language": {
+                    "url": "/js/Chinese.lang"
+                },
+                "ajax": {
+                    "url" : "/listMenu",
+                    "type":"get",
+                    "data":function(d){
+
+                    },
+                    "error":function(xhr, textStatus, errorThrown){
+                        alert("错误！！！")
+                    }
+                },
+                "columns": [
+                    {
+                        "data" : function(row, type, set, meta) {
+                            var c = meta.settings._iDisplayStart + meta.row + 1;
+                            return c;
+                        }
+                    },
+                    { "data": "name", "defaultContent": ""},
+                    { "data": "permission", "defaultContent": ""}
+                ],
+                'ordering':true,//排序功能
+                "order": [[ 0, "asc" ],[1, "desc"]]//asc为升序，desc为降序;
+            } );
+    }
+    init();
+
+</script>
+

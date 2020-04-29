@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dashboard.adp.dao.AdpStockDelayMapper">
+
+    <select id="adpStockDelayList" resultType="java.util.HashMap">
+          select factory_name,pj_name,matriel_name,stock_age_gt90 from adp_stock_delay
+	</select>
+
+
+    <select id="adpStorageLoad" resultType="java.util.HashMap">
+        SELECT
+            abf.factory_name as factory_name,
+            abf.storage_capacity as storage_capacity,
+            sum(asl.used) as used
+        FROM
+            "adp_storage_load" as asl
+        left join
+            "adp_base_factory" as abf
+        on
+            asl.factory_code = abf.factory_code
+        GROUP BY
+            abf.factory_name,
+            abf.storage_capacity
+	</select>
+
+
+    <select id="assemblyPlant" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+            abf.factory_code AS factory_code,
+            abf.factory_name AS factory_name,
+            abf.factory_lng AS factory_lng,
+            abf.factory_lat AS factory_lat
+        FROM
+          "adp_stock_large_parts_age" aslpa
+        LEFT JOIN adp_base_factory abf ON aslpa.factory_code = abf.factory_code
+        LEFT JOIN adp_base_factory_supplier apfd ON aslpa.factory_code = apfd.fac_sup_code
+        WHERE
+          1 =1
+        <if test="sortMap.modelPlats!=null and sortMap.modelPlats!= ''">
+            and aslpa.model in(select model from adp_base_model where platform in(${sortMap.modelPlats}))
+        </if>
+        <if test="sortMap.machineType!=null and sortMap.machineType!= ''">
+            and  aslpa.model  in(${sortMap.machineType})
+        </if>
+        <if test="sortMap.factorytype!=null and sortMap.factorytype!= ''" >
+            AND apfd.fac_sup_flag IN (${sortMap.factorytype})
+        </if>
+        <if test="sortMap.factory!=null and sortMap.factory!=''">
+            AND aslpa.factory_name in (${sortMap.factory})
+        </if>
+        <if test="sortMap.largeparttype!=null and  sortMap.largeparttype != '' ">
+            AND aslpa.large_parts_type in (SELECT DISTINCT
+            large_part
+            FROM
+            adp_producer_part_cat
+            WHERE
+            part_cat IN (${sortMap.largeparttype}))
+        </if>
+        <if test="sortMap.largepart!=null and sortMap.largepart != ''  ">
+            AND aslpa.large_parts_type in(${sortMap.largepart})
+        </if>
+	</select>
+
+
+    <select id="largePartsTypeCount" resultType="java.util.HashMap" parameterType="java.lang.String">
+      	SELECT
+            large_parts_type,
+            count(large_parts_type) AS lptCount
+        FROM
+            "adp_stock_large_parts_age"
+        WHERE
+            factory_code = #{factoryCode}
+        GROUP BY
+            large_parts_type
+    </select>
+
+
+</mapper>

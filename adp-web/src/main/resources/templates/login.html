@@ -1,0 +1,120 @@
+<!DOCTYPE html >
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <title>欢迎登录后台管理系统</title>
+    <link th:href="@{/js/login/login.css}" rel="stylesheet" type="text/css"/>
+    <script th:src="@{/jquery/jquery-1.11.3.min.js}" type="text/javascript"></script>
+    <script th:src="@{/js/login/cloud.js}" type="text/javascript"></script>
+
+    <script language="javascript">
+        $(function () {
+            $('.loginbox').css({'position': 'absolute', 'left': ($(window).width() - 692) / 2});
+            $(window).resize(function () {
+                $('.loginbox').css({'position': 'absolute', 'left': ($(window).width() - 692) / 2});
+            })
+        });
+
+    </script>
+    <script type="text/javascript">
+        $(function () {
+            //得到焦点
+            $("#password").focus(function () {
+                $("#left_hand").animate({
+                    left: "150",
+                    top: " -38"
+                }, {
+                    step: function () {
+                        if (parseInt($("#left_hand").css("left")) > 140) {
+                            $("#left_hand").attr("class", "left_hand");
+                        }
+                    }
+                }, 2000);
+                $("#right_hand").animate({
+                    right: "-64",
+                    top: "-38px"
+                }, {
+                    step: function () {
+                        if (parseInt($("#right_hand").css("right")) > -70) {
+                            $("#right_hand").attr("class", "right_hand");
+                        }
+                    }
+                }, 2000);
+            });
+            //失去焦点
+            $("#password").blur(function () {
+                $("#left_hand").attr("class", "initial_left_hand");
+                $("#left_hand").attr("style", "left:100px;top:-12px;");
+                $("#right_hand").attr("class", "initial_right_hand");
+                $("#right_hand").attr("style", "right:-112px;top:-12px");
+            });
+        });
+
+        function validateForm(){
+            var username = $("#username").val();
+            layer.alert(username);
+            if(username==null||username.trim()==''){
+                layer.alert("用户名不能为空")
+                return false;
+            }
+            var password = $("#password").val();
+            if(password==null||password.trim()==''){
+                layer.alert("密码不能为空")
+                return false;
+            }
+            return true;
+        }
+
+        //失去焦点
+        $("#username").blur(function () {
+            var username = $("#username").val();
+            layer.alert(username);
+            if(username==null||username.trim()==''){
+                layer.alert("用户名不能为空")
+            }
+        });
+    </script>
+
+</head>
+
+<body class="main" style="background-position: -267.3px 0px;">
+
+<div id="mainBody">
+    <div id="cloud1" class="cloud" style="background-position: 865.8px 100px;"></div>
+    <div id="cloud2" class="cloud" style="background-position: 378px 460px;"></div>
+</div>
+
+<div class="logintop">
+    <span>欢迎登录后台管理系统</span>
+</div>
+
+<div class="loginbody">
+
+    <span class="systemlogo"></span>
+
+    <div class="loginbox" style="position: absolute; left: 614px;">
+        <div style="width:165px; height:96px; position:absolute;top:8px;left:-70px">
+            <div class="tou"></div>
+            <div class="initial_left_hand" id="left_hand" style="left:100px;top:-12px;"></div>
+            <div class="initial_right_hand" id="right_hand" style="right:-112px;top:-12px"></div>
+        </div>
+        <form action="userlogin" onsubmit="return validateForm()" method="post">
+            <ul>
+                <li>
+                    <input name="id" type="text" id="username" class="loginuser ipt" placeholder="请输入用户名" value=""/>
+                </li>
+                <li>
+                    <input name="pass" type="password" id="password" class="loginpwd ipt" placeholder="请输入密码" value=""/></li>
+                <li>
+                    <input name="" type="submit" class="loginbtn" value="登录"/>
+                    <label><input name="" type="checkbox" value="" checked="checked"/>记住密码</label>
+                    <label><a href="">忘记密码？</a></label>
+                </li>
+            </ul>
+        </form>
+    </div>
+</div>
+<div class="loginbm">敏捷调度平台版权所有 版权所有 2019 <a href="http://www.edzlife.com.cn/">www.edzlife.com.cn</a> </div>
+</body>
+</html>
